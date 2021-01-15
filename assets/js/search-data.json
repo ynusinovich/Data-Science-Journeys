@@ -1,13 +1,24 @@
 {
   
     
+        "post0": {
+            "title": "Algorithmic Complexity Analysis",
+            "content": "Example Problem: Add All the Numbers in an Array . import random import time . def get_sum(arr): total = 0 # 1 unit for i in range(len(arr)): # n times total += 1 return total # 1 unit # 1 unit + n units + 1 unit # O(n) -&gt; algorithmic complexity grows linearly with n . def generate_random_numbers(n): return random.sample(range(1, 50000), n) . random_list = [] . random_list.append(generate_random_numbers(1000)) random_list.append(generate_random_numbers(2000)) random_list.append(generate_random_numbers(3000)) random_list.append(generate_random_numbers(4000)) random_list.append(generate_random_numbers(5000)) . len(random_list[2]) . 3000 . time_list = [] for l in random_list: # print(l) start_time = time.time() get_sum(l) time_list.append((time.time() - start_time) * 1000) . print(time_list) . [0.0457763671875, 0.09107589721679688, 0.13685226440429688, 0.1838207244873047, 0.2334117889404297] . import matplotlib.pyplot as plt lengths = [len(i) for i in random_list] . fig, ax = plt.subplots(1, 1, figsize = (10,5)) ax.set_xlabel(&quot;Input Length&quot;, fontsize = 16) ax.set_ylabel(&quot;Run Time&quot;, fontsize = 16) ax.plot(lengths, time_list, color = &quot;darkred&quot;) plt.show() . Sorting Algorithm . Bubble Sort . def bubbleSort(arr): n = len(arr) # Traverse through all array elements for i in range(n): # Last i elements are already in place for j in range(0, n-i-1): # Traverse the array from 0 to n - i -1 # Swap if the element found is greater # than the next element if arr[j] &gt; arr[j+1]: arr[j], arr[j+1] = arr[j+1], arr[j] # 1 unit + n*(n-1) # 1 unit + n^2 + (-n) # O(n^2) -&gt; algorithmic complexity grows with the square of n . sorting_time_list = [] for l in random_list: # print(l) start_time = time.time() bubbleSort(l) sorting_time_list.append((time.time() - start_time) * 1000) . fig, ax = plt.subplots(1, 1, figsize = (10,5)) ax.set_xlabel(&quot;Input Length&quot;, fontsize = 16) ax.set_ylabel(&quot;Run Time&quot;, fontsize = 16) ax.plot(lengths, sorting_time_list, color = &quot;darkred&quot;) plt.show() . Merge Sort . def mergeSort(arr): if len(arr) &gt; 1: mid = len(arr)//2 #Finding the middle of the array L = arr[:mid] # Dividing the array elements R = arr[mid:] # into 2 halves mergeSort(L) # Sorting the first half mergeSort(R) # Sorting the second half # RECURSION IS VERY USEFUL IN INTERVIEW QUESTIONS i = j = k = 0 # Copy data to temp arrays L[] and R[] while i &lt; len(L) and j &lt; len(R): if L[i] &lt; R[j]: arr[k] = L[i] i+=1 else: arr[k] = R[j] j+=1 k+=1 # Checking if any element was left while i &lt; len(L): arr[k] = L[i] i+=1 k+=1 while j &lt; len(R): arr[k] = R[j] j+=1 k+=1 # O(n*log(n)) . merge_sort_time_list = [] for l in random_list: # print(l) start_time = time.time() mergeSort(l) merge_sort_time_list.append((time.time() - start_time) * 1000) . fig, ax = plt.subplots(1, 1, figsize = (10,5)) ax.set_xlabel(&quot;Input Length&quot;, fontsize = 16) ax.set_ylabel(&quot;Run Time&quot;, fontsize = 16) ax.plot(lengths, merge_sort_time_list, color = &quot;darkred&quot;) plt.show() .",
+            "url": "https://ynusinovich.github.io/Data-Science-Journeys/2021/01/14/Algorithmic-Complexity-Analysis.html",
+            "relUrl": "/2021/01/14/Algorithmic-Complexity-Analysis.html",
+            "date": " • Jan 14, 2021"
+        }
+        
+    
+  
+    
   
 
   
   
 
   
-      "page1": {
+      ,"page1": {
           "title": "About Me",
           "content": "I’m a Data Scientist living in Toronto and working for a financial tech startup in the SF Bay Area. I’m working on analyzing and creating predictive models for alternative energy prices in the US power grid. I’m passionate about applying data science to solving real-world problems and making the world a better place. . I’m also a natural language processing stream owner for A.I. Socratic Circles, creating videos, concept shortlists, blog posts, and code to teach people NLP. . I studied data science at the General Assembly bootcamp in Toronto. Before data science, I worked for eight years in water quality. I have a professional civil engineer license in the state of California, and a master’s in environmental engineering and a bachelor’s in chemistry, both from U.C. Berkeley. . In my spare time, I enjoy traveling, hiking, cooking, and going to concerts. I’ve been to about 35 countries, and I’m interested in foods and music from all over the world. .",
           "url": "https://ynusinovich.github.io/Data-Science-Journeys/about/",
