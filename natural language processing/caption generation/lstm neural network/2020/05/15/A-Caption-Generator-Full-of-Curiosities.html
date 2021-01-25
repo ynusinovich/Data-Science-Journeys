@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A Caption Generator Full of Curiosities | Data Science Journeys</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="A Caption Generator Full of Curiosities" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A creative caption generator based on limited and varied training data." />
+<meta property="og:description" content="A creative caption generator based on limited and varied training data." />
+<link rel="canonical" href="https://ynusinovich.github.io/Data-Science-Journeys/natural%20language%20processing/caption%20generation/lstm%20neural%20network/2020/05/15/A-Caption-Generator-Full-of-Curiosities.html" />
+<meta property="og:url" content="https://ynusinovich.github.io/Data-Science-Journeys/natural%20language%20processing/caption%20generation/lstm%20neural%20network/2020/05/15/A-Caption-Generator-Full-of-Curiosities.html" />
+<meta property="og:site_name" content="Data Science Journeys" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-15T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://ynusinovich.github.io/Data-Science-Journeys/natural%20language%20processing/caption%20generation/lstm%20neural%20network/2020/05/15/A-Caption-Generator-Full-of-Curiosities.html","@type":"BlogPosting","headline":"A Caption Generator Full of Curiosities","dateModified":"2020-05-15T00:00:00-05:00","datePublished":"2020-05-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://ynusinovich.github.io/Data-Science-Journeys/natural%20language%20processing/caption%20generation/lstm%20neural%20network/2020/05/15/A-Caption-Generator-Full-of-Curiosities.html"},"description":"A creative caption generator based on limited and varied training data.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/Data-Science-Journeys/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://ynusinovich.github.io/Data-Science-Journeys/feed.xml" title="Data Science Journeys" /><link rel="shortcut icon" type="image/x-icon" href="/Data-Science-Journeys/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/Data-Science-Journeys/">Data Science Journeys</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Data-Science-Journeys/about/">About Me</a><a class="page-link" href="/Data-Science-Journeys/search/">Search</a><a class="page-link" href="/Data-Science-Journeys/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A Caption Generator Full of Curiosities</h1><p class="page-description">A creative caption generator based on limited and varied training data.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-15T00:00:00-05:00" itemprop="datePublished">
+        May 15, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      14 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#natural language processing">natural language processing</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#caption generation">caption generation</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#LSTM neural network">LSTM neural network</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/ynusinovich/Data-Science-Journeys/tree/master/_notebooks/2020-05-15-A-Caption-Generator-Full-of-Curiosities.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/ynusinovich/Data-Science-Journeys/master?filepath=_notebooks%2F2020-05-15-A-Caption-Generator-Full-of-Curiosities.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/ynusinovich/Data-Science-Journeys/blob/master/_notebooks/2020-05-15-A-Caption-Generator-Full-of-Curiosities.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Theory">Theory </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#What-does-a-neural-network-based-caption-generator-do?">What does a neural-network-based caption generator do? </a></li>
+<li class="toc-entry toc-h3"><a href="#What-was-the-purpose-of-my-caption-generator?">What was the purpose of my caption generator? </a></li>
+<li class="toc-entry toc-h3"><a href="#What-is-a-neural-network?">What is a neural network? </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Examples">Examples </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#What-would-a-travel-caption-generator-be-good-for?">What would a travel caption generator be good for? </a></li>
+<li class="toc-entry toc-h3"><a href="#What-could-other-caption-generators-be-good-for?">What could other caption generators be good for? </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Code-Part-1">Code Part 1 </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#How-to-create-a-travel-photograph-caption-generator.">How to create a travel photograph caption generator. </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Code-Part-2">Code Part 2 </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#How-to-output-captions-with-your-travel-photograph-caption-generator.">How to output captions with your travel photograph caption generator. </a></li>
+<li class="toc-entry toc-h3"><a href="#Example-Captions-for-an-Image">Example Captions for an Image </a></li>
+</ul>
+</li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-05-15-A-Caption-Generator-Full-of-Curiosities.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Theory">
+<a class="anchor" href="#Theory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Theory<a class="anchor-link" href="#Theory"> </a>
+</h2>
+<h3 id="What-does-a-neural-network-based-caption-generator-do?">
+<a class="anchor" href="#What-does-a-neural-network-based-caption-generator-do?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What does a neural-network-based caption generator do?<a class="anchor-link" href="#What-does-a-neural-network-based-caption-generator-do?"> </a>
+</h3>
+<ul>
+<li>A caption generator takes a photograph and outputs a caption. A caption generator trained on a neural network knows what kind of words to output based on previous captions and photographs that it has been trained on.</li>
+<li>All of the neural-network-based caption generator projects I found used large datasets of images with descriptive captions (e.g., the Flickr8k dataset, containing 8,000 images with 5 captions each). The three best example projects that I referenced when creating my project are listed below:<ul>
+<li>
+<a href="https://towardsdatascience.com/image-captioning-with-keras-teaching-computers-to-describe-pictures-c88a46a311b8">Image Captioning with Keras</a> by Harshall Lamba</li>
+<li>
+<a href="https://machinelearningmastery.com/develop-a-deep-learning-caption-generation-model-in-python/">How to Develop a Deep Learning Photo Caption Generator from Scratch</a> by Dr. Jason Brownlee</li>
+<li>
+<a href="https://data-flair.training/blogs/python-based-project-image-caption-generator-cnn/">Python based Project – Learn to Build Image Caption Generator with CNN &amp; LSTM</a> by the Dataflair Team</li>
+</ul>
+</li>
+<li>The goal of these caption generators was to describe the contents of the images precisely, not to develop creative captions.</li>
+</ul>
+<h3 id="What-was-the-purpose-of-my-caption-generator?">
+<a class="anchor" href="#What-was-the-purpose-of-my-caption-generator?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What was the purpose of my caption generator?<a class="anchor-link" href="#What-was-the-purpose-of-my-caption-generator?"> </a>
+</h3>
+<ul>
+<li>I created a caption generator that was trained on travel photographs from the "Places" category on the website <a href="https://www.atlasobscura.com/places">Atlas Obscura</a> in order to help people write creative travel captions by capturing the mood of the photographs. My secondary goal was to explore the uses and limits of neural networks.</li>
+<li>I described in <a href="https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html">my last blog post</a> how I used Scrapy to download the image links and image captions from Atlas Obscura.</li>
+<li>Due to the large variations in captions on Atlas Obscura, which were meant to be historical and artistic and not just descriptive, I did not expect the model to generate perfect captions. <a href="https://towardsdatascience.com/do-it-for-the-gram-instagram-style-caption-generator-4e7044766e34">A similar type of project</a> for generating Instagram captions ended up creating repeating captions for most photographs.</li>
+<li>The first time fitting my caption generator model gave me the following odd caption for every image I tested: "the worlds largest bioluminescent salt mine is the most remote place in the world and the worlds largest collection of curiosities and curiosities and curiosities and curiosities and curiosities and curiosities and curiosities and curiosities and curiosities and curiosities," which is the inspiration for the name of this blog post.</li>
+</ul>
+<h3 id="What-is-a-neural-network?">
+<a class="anchor" href="#What-is-a-neural-network?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is a neural network?<a class="anchor-link" href="#What-is-a-neural-network?"> </a>
+</h3>
+<p>As explained in <a href="https://news.mit.edu/2017/explained-neural-networks-deep-learning-0414">this article from MIT News</a>, "Neural net[work]s are a means of doing machine learning, in which a computer learns to perform some task by analyzing training examples. Usually, the examples have been hand-labeled in advance. An object recognition system, for instance, might be fed thousands of labeled images of cars, houses, coffee cups, and so on, and it would find visual patterns in the images that consistently correlate with particular labels."</p>
+<h2 id="Examples">
+<a class="anchor" href="#Examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples<a class="anchor-link" href="#Examples"> </a>
+</h2>
+<h3 id="What-would-a-travel-caption-generator-be-good-for?">
+<a class="anchor" href="#What-would-a-travel-caption-generator-be-good-for?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What would a <em>travel</em> caption generator be good for?<a class="anchor-link" href="#What-would-a-travel-caption-generator-be-good-for?"> </a>
+</h3>
+<ul>
+<li>Instagram, Facebook, or Pinterest captions</li>
+<li>Writing travel articles</li>
+<li>Advertising travel destinations</li>
+</ul>
+<h3 id="What-could-other-caption-generators-be-good-for?">
+<a class="anchor" href="#What-could-other-caption-generators-be-good-for?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What could <em>other</em> caption generators be good for?<a class="anchor-link" href="#What-could-other-caption-generators-be-good-for?"> </a>
+</h3>
+<ul>
+<li>Restaurant menus</li>
+<li>Real estate brochures</li>
+<li>Furniture descriptions</li>
+</ul>
+<h2 id="Code-Part-1">
+<a class="anchor" href="#Code-Part-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code Part 1<a class="anchor-link" href="#Code-Part-1"> </a>
+</h2>
+<h3 id="How-to-create-a-travel-photograph-caption-generator.">
+<a class="anchor" href="#How-to-create-a-travel-photograph-caption-generator." aria-hidden="true"><span class="octicon octicon-link"></span></a>How to create a travel photograph caption generator.<a class="anchor-link" href="#How-to-create-a-travel-photograph-caption-generator."> </a>
+</h3>
+<p>To start, complete the necessary imports. The command at the end resolved memory issues that stopped the model from running, but you may not need to use it:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing</span> <span class="kn">import</span> <span class="n">image</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing.sequence</span> <span class="kn">import</span> <span class="n">pad_sequences</span>
+<span class="kn">from</span> <span class="nn">keras.applications.inception_v3</span> <span class="kn">import</span> <span class="n">InceptionV3</span><span class="p">,</span> <span class="n">preprocess_input</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">Sequential</span><span class="p">,</span> <span class="n">load_model</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Dropout</span><span class="p">,</span> <span class="n">Flatten</span><span class="p">,</span> <span class="n">Conv2D</span><span class="p">,</span> <span class="n">MaxPooling2D</span><span class="p">,</span> <span class="n">LSTM</span><span class="p">,</span> <span class="n">Bidirectional</span><span class="p">,</span> <span class="n">Embedding</span>
+<span class="kn">from</span> <span class="nn">keras.layers.merge</span> <span class="kn">import</span> <span class="n">add</span>
+<span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">to_categorical</span><span class="p">,</span> <span class="n">plot_model</span>
+<span class="kn">from</span> <span class="nn">keras.callbacks</span> <span class="kn">import</span> <span class="n">ModelCheckpoint</span><span class="p">,</span> <span class="n">EarlyStopping</span>
+<span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">regularizers</span><span class="p">,</span> <span class="n">optimizers</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'KMP_DUPLICATE_LIB_OK'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'True'</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Using TensorFlow backend.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, load the caption dictionary and remove punctuation and numbers from the captions:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">caption_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"../Data/atlas_edits_clean.csv"</span><span class="p">)</span>
+<span class="n">caption_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Unnamed: 0"</span><span class="p">:</span> <span class="s2">"image_number"</span><span class="p">},</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">caption_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">caption_df</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+    <span class="n">caption_dict</span><span class="p">[</span><span class="n">caption_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">"image_number"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">caption_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">table</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)</span>
+<span class="c1"># characters to replace, characters to replace them with, characters to delete</span>
+
+<span class="k">for</span> <span class="n">image_number</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">caption_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># tokenize</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="c1"># convert to lower case</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">description</span><span class="p">]</span>
+    <span class="c1"># remove punctuation from each token</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">description</span><span class="p">]</span>
+    <span class="c1"># remove hanging 's' and 'a'</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">description</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># remove tokens with numbers in them</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">description</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()]</span>
+    <span class="c1"># store as string</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+    <span class="c1"># save in dict</span>
+    <span class="n">caption_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span>  <span class="n">description</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create a list of all the training captions</span>
+<span class="n">all_captions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">image_number</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">caption_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">all_captions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+
+<span class="c1"># Consider only words which occur at least 3 times in the corpus</span>
+<span class="n">word_count_threshold</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">word_counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">num_sentences</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">all_captions</span><span class="p">:</span>
+    <span class="n">num_sentences</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">sent</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">):</span>
+        <span class="n">word_counts</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># add one to the count of the word</span>
+
+<span class="n">vocab</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_counts</span> <span class="k">if</span> <span class="n">word_counts</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">word_count_threshold</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Preprocessed words </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span><span class="si">}</span><span class="s1"> '</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Number of sentences </span><span class="si">{</span><span class="n">num_sentences</span><span class="si">}</span><span class="s1"> '</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">save_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../Obj/'</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">'.pickle'</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+        
+<span class="n">save_obj</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="s2">"vocab"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On subsequent runs of your code, the vocabulary can be loaded from the folder you saved it to:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">load_obj</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../Obj/'</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">'.pickle'</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">load_obj</span><span class="p">(</span><span class="s2">"vocab"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Add 1 to the vocabulary, to account for blanks:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Add "startseq" to the beginning of each sequence and "endseq" to the end, so the model learns how to start and end a caption, and then save the finalized caption dictionary:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">image_number</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">caption_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">caption_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'startseq '</span> <span class="o">+</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' endseq'</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Image </span><span class="si">{</span><span class="n">image_number</span><span class="si">}</span><span class="s2"> added to caption dictionary"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">save_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../Obj/'</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">'.pickle'</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+        
+<span class="n">save_obj</span><span class="p">(</span><span class="n">caption_dict</span><span class="p">,</span> <span class="s2">"caption_dict"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On subsequent runs of your code, the caption dictionary can be loaded from the folder you saved it to:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>    
+<span class="n">caption_dict</span> <span class="o">=</span> <span class="n">load_obj</span><span class="p">(</span><span class="s2">"caption_dict"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Run the images through both the pre-processing step and the processing step of <a href="https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202">Google's InceptionV3 image processing model</a>. Remove the last two layers of the model so that the output would be a processed image data vector. The last two layers would have taken the processed image vector and outputted image classes based on images that the model was trained on. I saved after each step, but you could also complete both pre-processing and processing and then save:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">InceptionV3</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s1">'imagenet'</span><span class="p">)</span>
+<span class="c1"># Remove the last layer (output softmax layer) from the InceptionV3</span>
+<span class="n">model_new</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>WARNING:tensorflow:From /Users/yannusinovich/opt/anaconda3/lib/python3.7/site-packages/keras/backend/tensorflow_backend.py:4070: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+WARNING:tensorflow:From /Users/yannusinovich/opt/anaconda3/lib/python3.7/site-packages/keras/backend/tensorflow_backend.py:4074: The name tf.nn.avg_pool is deprecated. Please use tf.nn.avg_pool2d instead.
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pre_image_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"../Data/Atlas_Images/"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".jpg"</span><span class="p">):</span> 
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"../Data/Atlas_Images/"</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="c1"># Convert all the images to size 299 x 299 as expected by the InceptionV3 Model</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">299</span><span class="p">,</span> <span class="mi">299</span><span class="p">))</span>
+        <span class="c1"># Convert PIL image to numpy array of 3-dimensions</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">img_to_array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="c1"># Add one more dimension</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># preprocess images using preprocess_input() from inception module</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">preprocess_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># add to pre-imagedict</span>
+        <span class="n">image_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">pre_image_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Image </span><span class="si">{</span><span class="n">image_number</span><span class="si">}</span><span class="s2"> added to pre-image dictionary"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">save_obj</span><span class="p">(</span><span class="n">pre_image_dict</span><span class="p">,</span> <span class="s2">"pre_image_dict"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">image_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"../Data/Atlas_Images/"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".jpg"</span><span class="p">):</span> 
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"../Data/Atlas_Images/"</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">image_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">pre_image_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">model_new</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">image_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Image </span><span class="si">{</span><span class="n">image_number</span><span class="si">}</span><span class="s2"> added to image dictionary"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">save_obj</span><span class="p">(</span><span class="n">image_dict</span><span class="p">,</span> <span class="s2">"image_dict"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Please note that the only reason I saved the pre-image dictionary was that my computer crashed between the pre-processing step and the processing step. If yours doesn't, then don't save the pre-image dictionary - it's quite large.</p>
+<p>On subsequent runs of your code, the image dictionary can be loaded from the folder you saved it to. You do not need to re-load the pre-image dictionary:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>    
+<span class="n">image_dict</span> <span class="o">=</span> <span class="n">load_obj</span><span class="p">(</span><span class="s2">"image_dict"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Generate an index to encode words to numbers and back to words. Additionally, calculate the maximum length of the captions:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">index_to_word</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">word_to_index</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+    <span class="n">word_to_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="n">index_to_word</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">word</span>
+    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">to_lines</span><span class="p">(</span><span class="n">a_caption_dict</span><span class="p">):</span>
+    <span class="n">all_desc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">a_caption_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">all_desc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a_caption_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">all_desc</span>
+
+<span class="c1"># calculate the length of the description with the most words</span>
+<span class="k">def</span> <span class="nf">max_length</span><span class="p">(</span><span class="n">a_caption_dict</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">to_lines</span><span class="p">(</span><span class="n">a_caption_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">caption</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">caption</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">)</span>
+
+<span class="c1"># determine the maximum sequence length</span>
+<span class="n">max_length</span> <span class="o">=</span> <span class="n">max_length</span><span class="p">(</span><span class="n">caption_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Max Caption Length, in Words: </span><span class="si">{</span><span class="n">max_length</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Max Caption Length, in Words: 40
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Create a caption generator function. The caption generator continuously takes images and captions and yields data for the model to fit. The images are in the form of arrays. The captions are in the form of arrays of input word sequences, padded with zeros to be the same length, and words encoded categorically based on the vocabulary:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">data_generator</span><span class="p">(</span><span class="n">a_caption_dict</span><span class="p">,</span> <span class="n">an_image_dict</span><span class="p">,</span> <span class="n">a_word_to_index</span><span class="p">,</span> <span class="n">a_max_length</span><span class="p">,</span> <span class="n">a_num_photos_per_batch</span><span class="p">):</span>
+    <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># loop forever over images</span>
+    <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">image_number</span><span class="p">,</span> <span class="n">caption</span> <span class="ow">in</span> <span class="n">a_caption_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># retrieve the photo features</span>
+            <span class="n">photo_data</span> <span class="o">=</span> <span class="n">an_image_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span>
+            <span class="c1"># encode the sequence</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="p">[</span><span class="n">a_word_to_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">caption</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">' '</span><span class="p">)</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">a_word_to_index</span><span class="p">]</span>
+            <span class="c1"># split one sequence into multiple X, y pairs</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)):</span>
+                <span class="c1"># split into input and output pair</span>
+                <span class="n">in_seq</span><span class="p">,</span> <span class="n">out_seq</span> <span class="o">=</span> <span class="n">seq</span><span class="p">[:</span><span class="n">i</span><span class="p">],</span> <span class="n">seq</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="c1"># pad input sequence</span>
+                <span class="n">in_seq</span> <span class="o">=</span> <span class="n">pad_sequences</span><span class="p">([</span><span class="n">in_seq</span><span class="p">],</span> <span class="n">maxlen</span> <span class="o">=</span> <span class="n">a_max_length</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># encode output sequence</span>
+                <span class="n">out_seq</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">([</span><span class="n">out_seq</span><span class="p">],</span> <span class="n">num_classes</span> <span class="o">=</span> <span class="n">vocab_size</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># store</span>
+                <span class="n">X1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">photo_data</span><span class="p">)</span>
+                <span class="n">X2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">in_seq</span><span class="p">)</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_seq</span><span class="p">)</span>
+            <span class="c1"># yield the batch data</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">a_num_photos_per_batch</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X2</span><span class="p">)],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+                <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Create an embedding matrix using the pre-trained <a href="https://nlp.stanford.edu/projects/glove/">GloVe vectors</a> to be able to embed the caption words as vectors based on their similarity:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">glove_dir</span> <span class="o">=</span> <span class="s1">'../Data/'</span>
+<span class="n">embeddings_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">glove_dir</span><span class="p">,</span> <span class="s1">'glove.6B.200d.txt'</span><span class="p">),</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">'float32'</span><span class="p">)</span>
+    <span class="n">embeddings_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="n">coefs</span>
+<span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">embedding_dim</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="c1"># Get 200-dim dense matrix for each of the words in our vocabulary</span>
+<span class="n">embedding_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">word_to_index</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">embedding_vector</span> <span class="o">=</span> <span class="n">embeddings_index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">embedding_vector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Words not found in the embedding index will be all zeros</span>
+        <span class="n">embedding_matrix</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">embedding_vector</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Create a neural network model to process the image and caption data. The image extractor uses a regular dense layer with dropout for regularization, and the caption sequencer uses an embedding layer, dropout for regularization, and a <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">long short term memory</a>  network (LSTM) to remember words from earlier in the sequence. Finally, both outputs are sent to two more dense layers, the first of which has <a href="https://ynusinovich.github.io/Data-Science-Journeys/linear%20regression/regularization/2020/04/01/My-Linear-Regressions-Are-Looking-Irregular.html">L2 regularization</a>. The weights of the embedding layer are fixed so that the fitting of the model does not change the pre-trained vectors of the words.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inputs1</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2048</span><span class="p">,))</span>
+<span class="n">fe1</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)(</span><span class="n">inputs1</span><span class="p">)</span>
+<span class="n">fe2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s1">'relu'</span><span class="p">)(</span><span class="n">fe1</span><span class="p">)</span>
+
+<span class="c1"># partial caption sequence model</span>
+<span class="n">inputs2</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_length</span><span class="p">,))</span>
+<span class="n">se1</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">mask_zero</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)(</span><span class="n">inputs2</span><span class="p">)</span>
+<span class="n">se2</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)(</span><span class="n">se1</span><span class="p">)</span>
+<span class="n">se3</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="mi">256</span><span class="p">)(</span><span class="n">se2</span><span class="p">)</span>
+
+<span class="c1"># decoder (feed forward) model</span>
+<span class="n">decoder1</span> <span class="o">=</span> <span class="n">add</span><span class="p">([</span><span class="n">fe2</span><span class="p">,</span> <span class="n">se3</span><span class="p">])</span>
+<span class="n">decoder2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s1">'relu'</span><span class="p">,</span> <span class="n">kernel_regularizer</span> <span class="o">=</span> <span class="n">regularizers</span><span class="o">.</span><span class="n">l2</span><span class="p">(</span><span class="mf">0.005</span><span class="p">))(</span><span class="n">decoder1</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s1">'softmax'</span><span class="p">)(</span><span class="n">decoder2</span><span class="p">)</span>
+
+<span class="c1"># merge the two input models</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">inputs1</span><span class="p">,</span> <span class="n">inputs2</span><span class="p">],</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>WARNING:tensorflow:From /Users/yannusinovich/opt/anaconda3/lib/python3.7/site-packages/tensorflow/python/keras/backend.py:3794: add_dispatch_support.&lt;locals&gt;.wrapper (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.where in 2.0, which has the same broadcast rule as np.where
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_weights</span><span class="p">([</span><span class="n">embedding_matrix</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Model: "model_2"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+input_3 (InputLayer)            (None, 40)           0                                            
+__________________________________________________________________________________________________
+input_2 (InputLayer)            (None, 2048)         0                                            
+__________________________________________________________________________________________________
+embedding_1 (Embedding)         (None, 40, 200)      1609400     input_3[0][0]                    
+__________________________________________________________________________________________________
+dropout_1 (Dropout)             (None, 2048)         0           input_2[0][0]                    
+__________________________________________________________________________________________________
+dropout_2 (Dropout)             (None, 40, 200)      0           embedding_1[0][0]                
+__________________________________________________________________________________________________
+dense_1 (Dense)                 (None, 256)          524544      dropout_1[0][0]                  
+__________________________________________________________________________________________________
+lstm_1 (LSTM)                   (None, 256)          467968      dropout_2[0][0]                  
+__________________________________________________________________________________________________
+add_1 (Add)                     (None, 256)          0           dense_1[0][0]                    
+                                                                 lstm_1[0][0]                     
+__________________________________________________________________________________________________
+dense_2 (Dense)                 (None, 256)          65792       add_1[0][0]                      
+__________________________________________________________________________________________________
+dense_3 (Dense)                 (None, 8047)         2068079     dense_2[0][0]                    
+==================================================================================================
+Total params: 4,735,783
+Trainable params: 3,126,383
+Non-trainable params: 1,609,400
+__________________________________________________________________________________________________
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Select a <code>learning_rate</code>. <a href="https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/">This blog post</a> is useful guidance when setting the <code>learning_rate</code>. Use <code>categorical_crossentropy</code> for the <code>loss</code>, since each output word corresponds to one of the words (categories) in the vocabulary:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">opt</span> <span class="o">=</span> <span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span> <span class="o">=</span> <span class="s1">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">opt</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, train the model and then save it. The <code>num_photos_per_batch</code> can be reduced if you need to use less memory, and you can add <code>EarlyStopping</code> so that the model will stop training if <code>loss</code> is not decreasing for a <code>patience</code> of 5 epochs. The <code>steps_per_epoch</code> below are the default from the <a href="https://www.tensorflow.org/api_docs/python/tf/keras/Model#fit">Keras documentation</a>:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num_photos_per_batch</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="n">generator</span> <span class="o">=</span> <span class="n">data_generator</span><span class="p">(</span><span class="n">caption_dict</span><span class="p">,</span> <span class="n">image_dict</span><span class="p">,</span> <span class="n">word_to_index</span><span class="p">,</span> <span class="n">max_length</span><span class="p">,</span> <span class="n">num_photos_per_batch</span><span class="p">)</span>
+
+<span class="n">early_stop</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span> <span class="o">=</span> <span class="s2">"loss"</span><span class="p">,</span> 
+                           <span class="n">patience</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                           <span class="n">min_delta</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                           <span class="n">restore_best_weights</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">caption_dict</span><span class="p">)</span><span class="o">/</span><span class="n">num_photos_per_batch</span><span class="p">),</span>
+                    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">early_stop</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"../Obj/final_model_2.h5"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Code-Part-2">
+<a class="anchor" href="#Code-Part-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code Part 2<a class="anchor-link" href="#Code-Part-2"> </a>
+</h2>
+<h3 id="How-to-output-captions-with-your-travel-photograph-caption-generator.">
+<a class="anchor" href="#How-to-output-captions-with-your-travel-photograph-caption-generator." aria-hidden="true"><span class="octicon octicon-link"></span></a>How to output captions with your travel photograph caption generator.<a class="anchor-link" href="#How-to-output-captions-with-your-travel-photograph-caption-generator."> </a>
+</h3>
+<p>Start with the same steps as in the previous section. First, load up the vocabulary:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">load_obj</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../Obj/'</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">'.pickle'</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">load_obj</span><span class="p">(</span><span class="s2">"vocab"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">index_to_word</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">word_to_index</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">vocab</span><span class="p">:</span>
+    <span class="n">word_to_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="n">index_to_word</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">word</span>
+    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_length</span> <span class="o">=</span> <span class="mi">40</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then, process the images in your test folder using the InceptionV3 model, and load the trained caption generator model:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pre_model</span> <span class="o">=</span> <span class="n">InceptionV3</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s1">'imagenet'</span><span class="p">)</span>
+<span class="n">new_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">pre_model</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">pre_model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">image_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"../Data/Test_Photos/"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".jpg"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".jpeg"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".png"</span><span class="p">):</span> 
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"../Data/Test_Photos/"</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="c1"># Convert all the images to size 299 x 299 as expected by the InceptionV3 Model</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">299</span><span class="p">,</span> <span class="mi">299</span><span class="p">))</span>
+        <span class="c1"># Convert PIL image to numpy array of 3-dimensions</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">img_to_array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="c1"># Add one more dimension</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># preprocess images using preprocess_input() from inception module</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">preprocess_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">new_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">image_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">image_dict</span><span class="p">[</span><span class="n">image_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s2">"../Obj/final_model.h5"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, define a function to generate captions. Given a photograph processed through the steps above, the function chooses one of the top <code>a_randomness</code> word indices predicted by the model, converts it back to a word, and adds it to the output sequence. The next word in the output sequence is predicted by the photograph and the previous words. Using the top <code>a_randomness</code> words, instead of restricting the caption generator function to the top single word, introduces some randomness to prevent captions from looking too similar:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">captionGenerator</span><span class="p">(</span><span class="n">a_photo</span><span class="p">,</span> <span class="n">a_randomness</span><span class="p">):</span>
+    <span class="n">in_text</span> <span class="o">=</span> <span class="s1">'startseq'</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length</span><span class="p">):</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">word_to_index</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">in_text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_to_index</span><span class="p">]</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="n">pad_sequences</span><span class="p">([</span><span class="n">sequence</span><span class="p">],</span> <span class="n">maxlen</span> <span class="o">=</span> <span class="n">max_length</span><span class="p">)</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">a_photo</span><span class="p">,</span> <span class="n">sequence</span><span class="p">],</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">((</span><span class="o">-</span><span class="n">yhat</span><span class="p">)</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">a_randomness</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">index_to_word</span><span class="p">[</span><span class="n">yhat</span><span class="p">]</span>
+        <span class="n">in_text</span> <span class="o">+=</span> <span class="s1">' '</span> <span class="o">+</span> <span class="n">word</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="o">==</span> <span class="s1">'endseq'</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="n">final</span> <span class="o">=</span> <span class="n">in_text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">final</span> <span class="o">=</span> <span class="n">final</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">final</span> <span class="o">=</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">final</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">final</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">photo</span> <span class="o">=</span> <span class="n">image_dict</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2048</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">captionGenerator</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-Captions-for-an-Image">
+<a class="anchor" href="#Example-Captions-for-an-Image" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example Captions for an Image<a class="anchor-link" href="#Example-Captions-for-an-Image"> </a>
+</h3>
+<p>I used this sample photograph of Kotor, Montenegro, from the <a href="https://media4.s-nbcnews.com/i/newscms/2015_44/839916/lonely-planet-travel-kotor-today-151029-tease_84543027bb82cc77d65d99229ec6cac0.jpg">NBC News</a> website:</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-15-Image-1.jpeg" alt=""></p>
+<p>Running the caption generator resulted in captions like:</p>
+<ul>
+<li>"the largest manmade crater on the earth and and an ancient egyptian village in an extreme world of the world is now home to the most important collection with oddities and oddities specimens and antique penny of dentistry and"</li>
+<li>"of the world and most powerful of the world and an ancient church with the largest collection of the world and most important and curiosities of pathological planetariums and and the largest planetariums of the world and most curious"</li>
+<li>"and the worlds tallest cave in north america the world is the worlds tallest hole in europe is the largest drain in europe of the world is now an amazing illusion and an eccentric illusion of the illustrious achievements"</li>
+</ul>
+<p>Powerful, I couldn't have captioned it better myself.</p>
+<p>Feel free to play around with a smaller version of the caption generator (that would fit on the free version of Heroku) in <a href="https://caption-generator-obscura.herokuapp.com/">my web app</a>. Keep in mind that on the web app, I refer to the "randomness" as "unpredictability."</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="ynusinovich/Data-Science-Journeys"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/Data-Science-Journeys/natural%20language%20processing/caption%20generation/lstm%20neural%20network/2020/05/15/A-Caption-Generator-Full-of-Curiosities.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/Data-Science-Journeys/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/Data-Science-Journeys/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Yan Nusinovich&#39;s Data Science Blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#linkedin"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
