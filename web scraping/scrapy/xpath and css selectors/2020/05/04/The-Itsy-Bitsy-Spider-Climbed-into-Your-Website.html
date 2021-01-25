@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>The Itsy Bitsy Spider Climbed into Your Website | Data Science Journeys</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="The Itsy Bitsy Spider Climbed into Your Website" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Creating your first Scrapy web spider to get the data you need." />
+<meta property="og:description" content="Creating your first Scrapy web spider to get the data you need." />
+<link rel="canonical" href="https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html" />
+<meta property="og:url" content="https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html" />
+<meta property="og:site_name" content="Data Science Journeys" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-04T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html","@type":"BlogPosting","headline":"The Itsy Bitsy Spider Climbed into Your Website","dateModified":"2020-05-04T00:00:00-05:00","datePublished":"2020-05-04T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html"},"description":"Creating your first Scrapy web spider to get the data you need.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/Data-Science-Journeys/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://ynusinovich.github.io/Data-Science-Journeys/feed.xml" title="Data Science Journeys" /><link rel="shortcut icon" type="image/x-icon" href="/Data-Science-Journeys/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/Data-Science-Journeys/">Data Science Journeys</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Data-Science-Journeys/about/">About Me</a><a class="page-link" href="/Data-Science-Journeys/search/">Search</a><a class="page-link" href="/Data-Science-Journeys/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">The Itsy Bitsy Spider Climbed into Your Website</h1><p class="page-description">Creating your first Scrapy web spider to get the data you need.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-04T00:00:00-05:00" itemprop="datePublished">
+        May 4, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#web scraping">web scraping</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#Scrapy">Scrapy</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#XPath and CSS selectors">XPath and CSS selectors</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/ynusinovich/Data-Science-Journeys/tree/master/_notebooks/2020-05-04-The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/ynusinovich/Data-Science-Journeys/master?filepath=_notebooks%2F2020-05-04-The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/ynusinovich/Data-Science-Journeys/blob/master/_notebooks/2020-05-04-The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Theory">Theory </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#What-is-web-scraping?">What is web scraping? </a></li>
+<li class="toc-entry toc-h3"><a href="#What-are-the-different-methods-for-web-scraping-in-Python?">What are the different methods for web scraping in Python? </a></li>
+<li class="toc-entry toc-h3"><a href="#What-are-CSS-and-XPath-selectors?">What are CSS and XPath selectors? </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Examples">Examples </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#When-would-you-need-web-scraping?">When would you need web scraping? </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#Code">Code </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#An-Example-Web-Scraper-with-Scrapy">An Example Web Scraper with Scrapy </a></li>
+<li class="toc-entry toc-h3"><a href="#How-Did-I-Know-What-XPath-and-CSS-Selectors-to-Use?">How Did I Know What XPath and CSS Selectors to Use? </a></li>
+</ul>
+</li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-05-04-The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Theory">
+<a class="anchor" href="#Theory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Theory<a class="anchor-link" href="#Theory"> </a>
+</h2>
+<h3 id="What-is-web-scraping?">
+<a class="anchor" href="#What-is-web-scraping?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is web scraping?<a class="anchor-link" href="#What-is-web-scraping?"> </a>
+</h3>
+<p>Web scraping is a method to automate the extraction of large amounts of data from a website.</p>
+<h3 id="What-are-the-different-methods-for-web-scraping-in-Python?">
+<a class="anchor" href="#What-are-the-different-methods-for-web-scraping-in-Python?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What are the different methods for web scraping in Python?<a class="anchor-link" href="#What-are-the-different-methods-for-web-scraping-in-Python?"> </a>
+</h3>
+<p>Credit to <a href="https://elitedatascience.com/python-web-scraping-libraries">this blog post</a>.</p>
+<ul>
+<li>Level 1: Beautiful Soup and LXML<ul>
+<li>Parses data on a web page.</li>
+</ul>
+</li>
+<li>Level 2: Requests and Selenium<ul>
+<li>Fetches data from a web page.</li>
+</ul>
+</li>
+<li>Level 3: Scrapy<ul>
+<li>Systematically crawls through a web page and "manages requests, preserves user sessions, follows redirects, and handles output pipelines."</li>
+</ul>
+</li>
+</ul>
+<h3 id="What-are-CSS-and-XPath-selectors?">
+<a class="anchor" href="#What-are-CSS-and-XPath-selectors?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What are CSS and XPath selectors?<a class="anchor-link" href="#What-are-CSS-and-XPath-selectors?"> </a>
+</h3>
+<ul>
+<li>CSS and XPath can be used for selecting elements on a webpage. Credit to <a href="https://medium.com/dataflow-kit/css-selectors-vs-xpath-f368b431c9dc">this blog post</a>:<ul>
+<li>"Cascading Style Sheets (CSS) is a style sheet language used for describing the look and formatting of a document written in HTML or XML. CSS Selectors are patterns used to select the styled element(s)."</li>
+<li>"XPath, the XML path language, is a query language for selecting nodes from an XML document. Locating elements with XPath works very well with a lot of flexibility."</li>
+</ul>
+</li>
+<li>They are both part of our Scrapy example code below, which is used to crawl a website for images and captions.</li>
+</ul>
+<h2 id="Examples">
+<a class="anchor" href="#Examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples<a class="anchor-link" href="#Examples"> </a>
+</h2>
+<h3 id="When-would-you-need-web-scraping?">
+<a class="anchor" href="#When-would-you-need-web-scraping?" aria-hidden="true"><span class="octicon octicon-link"></span></a>When would you need web scraping?<a class="anchor-link" href="#When-would-you-need-web-scraping?"> </a>
+</h3>
+<p>Credit to <a href="https://towardsdatascience.com/https-medium-com-hiren787-patel-web-scraping-applications-a6f370d316f4">this blog post</a>, with direct quotations in quotation marks:</p>
+<ul>
+<li>"Competitor price monitoring"</li>
+<li>"Monitoring minimum advertised price compliance"</li>
+<li>"Fetching images and product descriptions"</li>
+<li>"Monitoring consumer sentiment"</li>
+<li>Aggregated news articles and news monitoring</li>
+<li>"Market data aggregation"</li>
+<li>"Extracting financial statement[s]"</li>
+<li>"Insurance"</li>
+<li>Predictive and real-time analytics</li>
+<li>"Machine-learning models"</li>
+<li>Data-driven and content marketing</li>
+<li>"Lead generation"</li>
+<li>"Competitive analysis"</li>
+<li>"Search engine optimization monitoring"</li>
+<li>"Reputation monitoring"</li>
+<li>"Academic research"</li>
+<li>"Data journalism"</li>
+<li>"Employment"</li>
+<li>"Search engine for classified sites"</li>
+</ul>
+<h2 id="Code">
+<a class="anchor" href="#Code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code<a class="anchor-link" href="#Code"> </a>
+</h2>
+<h3 id="An-Example-Web-Scraper-with-Scrapy">
+<a class="anchor" href="#An-Example-Web-Scraper-with-Scrapy" aria-hidden="true"><span class="octicon octicon-link"></span></a>An Example Web Scraper with Scrapy<a class="anchor-link" href="#An-Example-Web-Scraper-with-Scrapy"> </a>
+</h3>
+<p>I will show you what you need to do to create a basic web scraper that extracts and exports image URLs and image captions from the "Places" listing on my favorite website, a travel guide for obscure destinations called <a href="https://www.atlasobscura.com/places">Atlas Obscura</a>. I really appreciate them for letting me scrape their website, and in return I bought their book, their wall calendar, and their daily calendar.</p>
+<p>To start, install Scrapy in Terminal using Pip. Refer to <a href="https://www.liquidweb.com/kb/install-pip-windows/">this blog post</a> if you need help installing Pip. I use the <code>pip3</code> command because I'm installing the Scrapy package for my Python 3 installation (rather than using the <code>pip</code> command, which would alter my Macbook's system Python).</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-1.png" alt=""></p>
+<p>Next, change directory to the location you will create your web scraping project, and tell Scrapy to create a scraper project. Scrapy will create all the necessary files for you; you only need to alter the ones you need for your web scraper.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-2.png" alt=""></p>
+<p>Navigate to the project you created and then generate a web scraping program (spider) of the name you choose. Pass a root URL that you would like to scrape as well.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-3.png" alt=""></p>
+<p>In the main directory of the scraper, open <code>settings.py</code>. I used <a href="https://atom.io/">Atom text editor</a> for this project. In the settings.py file, add a feed format (I used CSV) and a feed URI (since I was saving the CSV to the web scraper directory, I only used the filename) to tell Scrapy how to export the web scraping results. Additionally, set code that identifies you and your website to the website you're accessing.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-4.png" alt=""></p>
+<p>Please keep in mind, there are myriad other settings to tune, and I am only covering the basics here. Now, open the scraper file in the spiders subdirectory of the folder (mine was called <code>AtlasScraper.py</code>). The file should be populated with some class variables like <code>name</code> (of scraper) and <code>start_urls</code> (which you had entered with the <code>genspider</code> command above). Edit the <code>parse</code> function to add code to parse the pages of the website.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-5.png" alt=""></p>
+<p>In this case, my parse function did the following:</p>
+<ol>
+<li>Downloaded the image URLs and the image descriptions on the page.</li>
+<li>Downloaded the total number of pages on the website.</li>
+<li>Waited for a few seconds to avoid overloading the website's servers.</li>
+<li>Yielded a dictionary entry with the URL, the image desciption, and the response code (200 means the download succeeded).</li>
+<li>Went to the next page.</li>
+<li>Repeated steps 1-5 until the scraper passed the last page.</li>
+</ol>
+<p>Finally, I started my web scraper, and I let it run for a few days.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-6.png" alt=""></p>
+<h3 id="How-Did-I-Know-What-XPath-and-CSS-Selectors-to-Use?">
+<a class="anchor" href="#How-Did-I-Know-What-XPath-and-CSS-Selectors-to-Use?" aria-hidden="true"><span class="octicon octicon-link"></span></a>How Did I Know What XPath and CSS Selectors to Use?<a class="anchor-link" href="#How-Did-I-Know-What-XPath-and-CSS-Selectors-to-Use?"> </a>
+</h3>
+<p>Go to the website, right-click on the item you want to download, and click "Inspect" to see the web page's code for the image. For my web scraper, I started with photo paths.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-7.png" alt=""></p>
+<p>As you can see, the relative path of this photo URL is in a <code>//div/figure/img/@data-src</code>. All the photo URLs had this relative path, so my XPath selector found all of them on the page. Next, I looked for the total number of pages in the web page's code.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-8.png" alt=""></p>
+<p>The number of pages was located in the URL located at <code>//span[@class='last']/a/@href</code>, so I used that for my Xpath selector. (Only the <code>span</code> with a <code>class</code> of <code>last</code> had the total number of pages in the URL.) Lastly, I looked for the image captions.</p>
+<p><img src="/Data-Science-Journeys/images/copied_from_nb/2020-05-04-Image-9.png" alt=""></p>
+<p>All of the image captions had <code>js-subtitle-content</code> in their <code>class</code>, so I used a CSS selector to extract the text associated with each of them.</p>
+<p>If you need a useful tool to help you with the XPath or CSS selectors, I recommend using the <a href="https://sanjayselectorshub.medium.com/chropath-firepath-for-chrome-browser-3130e72b4754">ChroPath</a> tool, which helps you generate XPath or CSS selectors, or the <a href="https://selectorgadget.com/">SelectorGadget</a> tool, which shows you the CSS selector for a set of elements you want to select on a web page.</p>
+<p>For more information, please see the following links:</p>
+<ul>
+<li><a href="https://www.analyticsvidhya.com/blog/2017/07/web-scraping-in-python-using-scrapy/">Web Scraping in Python Using Scrapy (with Multiple Examples)</a></li>
+<li><a href="https://www.datacamp.com/community/tutorials/making-web-crawlers-scrapy-python">Making Web Crawlers Using Scrapy for Python</a></li>
+<li><a href="https://letslearnabout.net/tutorial/scrapy-tutorial/python-scrapy-tutorial-for-beginners-01-creating-your-first-spider/">Python Scrapy Tutorial for Beginners – 01 – Creating Your First Spider</a></li>
+<li><a href="https://www.youtube.com/watch?v=ve_0h4Y8nuI&amp;list=PLhTjy8cBISEqkN-5Ku_kXG4QW33sxQo0t">Python Web Scraping &amp; Crawling Using Scrapy</a></li>
+<li><a href="https://towardsdatascience.com/scrape-multiple-pages-with-scrapy-ea8edfa4318">Scrape Multiple Pages with Scrapy</a></li>
+</ul>
+<p>I studied all of these before creating my scraper, so I recommend you check them out too.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="ynusinovich/Data-Science-Journeys"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/Data-Science-Journeys/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/Data-Science-Journeys/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Yan Nusinovich&#39;s Data Science Blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#linkedin"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
