@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>https://ynusinovich.github.io/Data-Science-Journeys/exponential%20distributions/statistics/2020/03/12/I-Am-Exponential-Distributions-and-So-Can-You.html</loc>
+<lastmod>2020-03-12T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://ynusinovich.github.io/Data-Science-Journeys/linear%20regression/regularization/2020/04/01/My-Linear-Regressions-Are-Looking-Irregular.html</loc>
+<lastmod>2020-04-01T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://ynusinovich.github.io/Data-Science-Journeys/feature%20importance/classification/f1%20score/2020/04/17/My-Boss-Wants-to-Know-How-Important-My-Features-Are.html</loc>
+<lastmod>2020-04-17T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://ynusinovich.github.io/Data-Science-Journeys/image%20processing/computer%20vision/classification/2020/04/27/Comparing-Apples-to-Apples.html</loc>
+<lastmod>2020-04-27T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://ynusinovich.github.io/Data-Science-Journeys/web%20scraping/scrapy/xpath%20and%20css%20selectors/2020/05/04/The-Itsy-Bitsy-Spider-Climbed-into-Your-Website.html</loc>
+<lastmod>2020-05-04T00:00:00-05:00</lastmod>
+</url>
+<url>
 <loc>https://ynusinovich.github.io/Data-Science-Journeys/about/</loc>
 </url>
 <url>
