@@ -4,7 +4,7 @@ title: About Me
 permalink: /about/
 ---
 
-I’m Yan Nusinovich, a Data Scientist living in Toronto and working remotely for a financial tech startup in the SF Bay Area. I’m analyzing and creating predictive models for alternative energy prices in the US power grid. I’m passionate about applying data science to solving real-world problems and making the world a better place.
+I’m Yan Nusinovich, a Data Scientist living in Toronto and working remotely for a financial tech startup in the SF Bay Area. I’m creating predictive models for alternative energy prices in the US power grid. I’m passionate about applying data science to solving real-world problems and making the world a better place.
 
 I'm also a natural language processing stream owner for [A.I. Socratic Circles](https://ai.science/people/PFBMvvKT5A), creating videos, concept shortlists, blog posts, and code to teach people NLP.
 
