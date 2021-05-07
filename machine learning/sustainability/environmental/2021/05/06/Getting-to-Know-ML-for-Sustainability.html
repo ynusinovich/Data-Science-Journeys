@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Getting to Know Machine Learning for Sustainability | Data Science Journeys</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Getting to Know Machine Learning for Sustainability" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="An introductory guide to helping the robots save the world." />
+<meta property="og:description" content="An introductory guide to helping the robots save the world." />
+<link rel="canonical" href="https://ynusinovich.github.io/Data-Science-Journeys/machine%20learning/sustainability/environmental/2021/05/06/Getting-to-Know-ML-for-Sustainability.html" />
+<meta property="og:url" content="https://ynusinovich.github.io/Data-Science-Journeys/machine%20learning/sustainability/environmental/2021/05/06/Getting-to-Know-ML-for-Sustainability.html" />
+<meta property="og:site_name" content="Data Science Journeys" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-06T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"An introductory guide to helping the robots save the world.","url":"https://ynusinovich.github.io/Data-Science-Journeys/machine%20learning/sustainability/environmental/2021/05/06/Getting-to-Know-ML-for-Sustainability.html","@type":"BlogPosting","headline":"Getting to Know Machine Learning for Sustainability","dateModified":"2021-05-06T00:00:00-05:00","datePublished":"2021-05-06T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://ynusinovich.github.io/Data-Science-Journeys/machine%20learning/sustainability/environmental/2021/05/06/Getting-to-Know-ML-for-Sustainability.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/Data-Science-Journeys/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://ynusinovich.github.io/Data-Science-Journeys/feed.xml" title="Data Science Journeys" /><link rel="shortcut icon" type="image/x-icon" href="/Data-Science-Journeys/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/Data-Science-Journeys/">Data Science Journeys</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Data-Science-Journeys/about/">About Me</a><a class="page-link" href="/Data-Science-Journeys/search/">Search</a><a class="page-link" href="/Data-Science-Journeys/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Getting to Know Machine Learning for Sustainability</h1><p class="page-description">An introductory guide to helping the robots save the world.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-05-06T00:00:00-05:00" itemprop="datePublished">
+        May 6, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#machine learning">machine learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#sustainability">sustainability</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/Data-Science-Journeys/categories/#environmental">environmental</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/ynusinovich/Data-Science-Journeys/tree/master/_notebooks/2021-05-06-Getting-to-Know-ML-for-Sustainability.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/ynusinovich/Data-Science-Journeys/master?filepath=_notebooks%2F2021-05-06-Getting-to-Know-ML-for-Sustainability.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/ynusinovich/Data-Science-Journeys/blob/master/_notebooks/2021-05-06-Getting-to-Know-ML-for-Sustainability.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/Data-Science-Journeys/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#What-is-ML-for-Sustainability?">What is ML for Sustainability? </a></li>
+<li class="toc-entry toc-h2"><a href="#Who-Is-This-For?">Who Is This For? </a></li>
+<li class="toc-entry toc-h2"><a href="#Main-Resources">Main Resources </a></li>
+<li class="toc-entry toc-h2"><a href="#Additional-Resources">Additional Resources </a></li>
+<li class="toc-entry toc-h2"><a href="#Conclusion">Conclusion </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-05-06-Getting-to-Know-ML-for-Sustainability.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="What-is-ML-for-Sustainability?">
+<a class="anchor" href="#What-is-ML-for-Sustainability?" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is ML for Sustainability?<a class="anchor-link" href="#What-is-ML-for-Sustainability?"> </a>
+</h2>
+<p>In this post, I’ll provide an overview of how ML can help preserve natural resources and maintain economic and environmental sustainability.</p>
+<h2 id="Who-Is-This-For?">
+<a class="anchor" href="#Who-Is-This-For?" aria-hidden="true"><span class="octicon octicon-link"></span></a>Who Is This For?<a class="anchor-link" href="#Who-Is-This-For?"> </a>
+</h2>
+<p>Any ML practitioner interested in applying ML to the environment, or any environmental engineer, environmental scientist, or sustainability professional interested in learning about how ML can improve their field.</p>
+<h2 id="Main-Resources">
+<a class="anchor" href="#Main-Resources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main Resources<a class="anchor-link" href="#Main-Resources"> </a>
+</h2>
+<ol>
+<li>Watch <a href="https://ai.science/e/ai-for-a-sustainable-future-think-globally-act-locally--AlR7yZE2wsUQDlUT6AFj@/streams/ai-sustainability">AI for a Sustainable Future: Think Globally, Act Locally!</a> in order to answer questions like, “What is the future of sustainability?” and “What are the key challenges and the contributions of ML in industries that play a role in the future of sustainability?"</li>
+<li>Read pages 8-10 of <a href="https://www.pwc.co.uk/sustainability-climate-change/assets/pdf/how-ai-can-enable-a-sustainable-future.pdf">How AI Can Enable a Sustainable Future | Microsoft &amp; PWC</a> in order to answer questions like, “What is the impact of ML in the future of the economy and the environment?” “What industries have a significant carbon footprint and how can utilizing ML reduce carbon emissions in those industries?” and “What is the impact of ML in the future job market?”</li>
+<li>Read <a href="https://www.forbes.com/sites/glenngow/2020/08/21/environmental-sustainability-and-ai/?sh=288abea67db3">Environmental Sustainability and AI | Forbes</a> in order to answer questions like, “Does ML have a carbon footprint?” and “How can ML be used to reduce carbon footprints?”</li>
+<li>Read <a href="https://www.forbes.com/sites/cognitiveworld/2019/09/04/how-iot-and-ai-can-enable-environmental-sustainability/?sh=60cd8f7668df">How IoT and AI Can Enable Environmental Sustainability | Forbes</a> in order to answer the question, “What are some uses of ML for environmental sustainability?”</li>
+<li>Visit <a href="https://www.microsoft.com/en-us/ai/ai-for-earth-tech-resources#primaryR10">AI for Earth Technical Resources | Microsoft</a> in order to answer the question, “What are some of the available open-source tools addressing ML for sustainability?” Explore and try out the APIs, data, and notebooks, and start applying your ML skills to environmental issues.</li>
+</ol>
+<h2 id="Additional-Resources">
+<a class="anchor" href="#Additional-Resources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additional Resources<a class="anchor-link" href="#Additional-Resources"> </a>
+</h2>
+<ol>
+<li>Skim <a href="https://ai.googleblog.com/2020/06/leveraging-temporal-context-for-object.html">Leveraging Temporal Context for Object Detection | Google AI</a> in order to answer the question, “How is ML useful in species protection?” Click on the links in the post if you want to learn more.</li>
+<li>Skim <a href="https://ai.googleblog.com/2020/09/the-technology-behind-our-recent.html">The Technology Behind our Recent Improvements in Flood Forecasting | Google AI</a> in order to answer the question, “Can ML be used for forecasting natural disasters?” Click on the links in the post if you want to learn more.</li>
+</ol>
+<h2 id="Conclusion">
+<a class="anchor" href="#Conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion<a class="anchor-link" href="#Conclusion"> </a>
+</h2>
+<p>Sustainability is not just for science; it’s relevant to business, public health, legislation development, and engineering. Research and funding for ML applications in sustainability are increasing with time. Now is the time to start contributing. To learn more, join the <a href="https://ai.science/dg">Machine Learning in Sustainability and the Environment discussion group</a>.</p>
+<p>This learning recipe and blog post was created by <a href="https://www.linkedin.com/in/afroughi/">Moja Afroughi</a>, <a href="https://www.linkedin.com/in/ynusinovich/">Yan Nusinovich</a>, <a href="https://www.linkedin.com/in/anhdaotv/">Ann Dao</a>, and <a href="https://www.linkedin.com/in/anatdemb/">Anat Nusinovich</a>. For more learning recipes, visit the <a href="https://ai.science">aggregate intellect website</a> and create a free account. See <a href="https://ai.science/l/04fe49e6-03b3-4b70-bf08-6cb638d08dd4@/">this learning recipe</a> for an interactive version of this post and to comment or collaborate.</p>
+<p>To learn more about learning recipes via a learning recipe, see <a href="https://ai.science/l/5787e0c1-be18-4953-b911-5064b243d522">RECIPE 0</a>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="ynusinovich/Data-Science-Journeys"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/Data-Science-Journeys/machine%20learning/sustainability/environmental/2021/05/06/Getting-to-Know-ML-for-Sustainability.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/Data-Science-Journeys/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/Data-Science-Journeys/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Yan Nusinovich&#39;s Data Science Blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/ynusinovich" title="ynusinovich"><svg class="svg-icon grey"><use xlink:href="/Data-Science-Journeys/assets/minima-social-icons.svg#linkedin"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
